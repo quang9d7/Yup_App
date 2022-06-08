@@ -8,4 +8,9 @@
     <string name="login_signup_hint">Don\'t have an account? Sign Up</string>
     <string name="login_name_hint">Name</string>
     <string name="login_mobile_number_hint">Mobile Number</string>
+
+
+    <string name="yup_sp">YupSP</string>
+    <string name="access_token">YUP_AT</string>
+    <string name="refresh_token">YUP_RT</string>
 </resources>

@@ -145,7 +145,7 @@
         app:layout_constraintVertical_bias="0.036" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/register_btn"
         android:layout_width="114dp"
         android:layout_height="55dp"
         android:backgroundTint="@color/loginBkColor"
@@ -167,7 +167,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.446"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button"
+        app:layout_constraintTop_toBottomOf="@+id/register_btn"
         app:layout_constraintVertical_bias="0.181"
         android:textColor="@color/primaryTextColor"/>
 
