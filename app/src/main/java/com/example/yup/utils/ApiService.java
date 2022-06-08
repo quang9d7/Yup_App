@@ -9,6 +9,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.PATCH;
@@ -23,7 +24,7 @@ public interface ApiService {
     Call<InfoMessage> register(@Body RequestBody body);
 
     // dang nhap user ( saui nay nho doi thanh GET("users")
-    @GET("users")
+    @POST("auth")
     @Headers("Content-Type: application/json")
     Call<TokenPair> login(@Body RequestBody body);
 

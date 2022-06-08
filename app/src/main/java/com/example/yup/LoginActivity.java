@@ -74,6 +74,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Neu da dang nhap
         if (sessionManager.getToken().getAccessToken() != null) {
+            Log.w("da dang nhap","OK");
             startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
             finish();
         }
