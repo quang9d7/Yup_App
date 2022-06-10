@@ -1,137 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:animateLayoutChanges="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_bk"
-    tools:context=".LoginActivity">
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SIGN IN"
-        android:textColor="@color/primaryTextColor"
-        android:textSize="40dp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.093"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.267" />
-
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="username"
-
-        android:textColor="@color/primaryTextColor"
-        android:textSize="18dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.081"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.071" />
-
-    <EditText
-        android:id="@+id/username"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:text=""
-        android:textSize="28dp"
-        android:importantForAutofill="no"
-        android:textColor="@color/purple_500"
-
-
-        app:layout_constraintBottom_toTopOf="@+id/textView3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.229"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:layout_constraintVertical_bias="0.245"
+    android:paddingHorizontal="30dp"
+    android:orientation="vertical">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp"
+        android:scaleType="centerInside"
+        android:adjustViewBounds="true"
+        android:src="@drawable/signin_cover"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="30dp"
         />
-
     <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="password"
-
-        android:textColor="@color/primaryTextColor"
-        android:textSize="18dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.087"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.293" />
-
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="350dp"
+        android:textSize="30dp"
+        android:text="Đăng nhập"
+        android:textStyle="bold"
+        android:textColor="#4C5461"
+        android:fontFamily="@font/montserrat_extrabold"
+        android:layout_marginBottom="20dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:inputType="textPassword"
-        android:text=""
-        android:textSize="28dp"
-        android:imeOptions="actionDone"
-        android:importantForAutofill="no"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.262"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"
-        app:layout_constraintVertical_bias="0.058"
-
-        android:textColor="@color/purple_500"/>
-
-    <TextView
-        android:id="@+id/no_acccount_btn"
-        android:layout_width="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="7dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center">
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_baseline_alternate_email_24"
+            app:tint="#A2AABA" />
+        <EditText
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#D3DDEF"
+            android:textColorHint="#A2AABA"
+            android:hint="Username"
+            android:textSize="16sp"
+            android:fontFamily="@font/montserrat_regular"
+            android:layout_marginHorizontal="10dp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Forgot your password"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.835"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password"
-        app:layout_constraintVertical_bias="0.108"
-        android:textColor="@color/primaryTextColor"/>
-
-    <Button
+        android:orientation="horizontal"
+        android:paddingVertical="7dp"
+        android:gravity="center">
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_outline_lock_24"
+            app:tint="#A2AABA" />
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#D3DDEF"
+            android:hint="Mật khẩu"
+            android:textSize="16sp"
+            android:fontFamily="@font/montserrat_regular"
+            android:textColorHint="#A2AABA"
+            android:inputType="textPassword"
+            android:layout_marginHorizontal="10dp" />
+    </LinearLayout>
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_login"
-        android:layout_width="150dp"
-        android:layout_height="70dp"
-        android:backgroundTint="@color/loginBkColor"
-        android:text="LOGIN"
-        android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.877"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/no_acccount_btn"
-        app:layout_constraintVertical_bias="0.18" />
-
-    <TextView
-        android:id="@+id/btn_sign_up"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sign up?"
-        android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.883"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_login"
-        app:layout_constraintVertical_bias="0.169"
-        android:textColor="@color/primaryTextColor"
-        android:clickable="true"/>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:paddingVertical="15dp"
+        android:text="Đăng nhập"
+        android:fontFamily="@font/montserrat_bold"
+        app:cornerRadius="15dp"
+        android:layout_marginTop="25dp"
+        android:backgroundTint="#0065ff"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="Chưa có tài khoản? "
+            android:textSize="13dp"/>
+        <EditText
+            android:id="@+id/btn_sign_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="Đăng ký ngay!"
+            android:fontFamily="@font/montserrat_regular"
+            android:focusable="false"
+            android:textColor="#0065ff"
+            android:textStyle="bold"
+            android:textSize="13dp"/>
+    </LinearLayout>
+</LinearLayout>

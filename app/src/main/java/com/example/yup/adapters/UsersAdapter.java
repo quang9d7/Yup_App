@@ -47,7 +47,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
         TextView userName;
         public UsersViewHolder(@NonNull View itemView) {
             super(itemView);
-            userName = itemView.findViewById(R.id.tv_username);
         }
     }
 
