@@ -3,6 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Huy/Documents/Yup_App/Yup_App/app/src/main/res/layout/activity_dashboard.xml" value="0.26875" />
+        <entry key="..\:/Users/Huy/Documents/Yup_App/Yup_App/app/src/main/res/layout/activity_dashboard_temp.xml" value="0.26875" />
+        <entry key="..\:/Users/Huy/Documents/Yup_App/Yup_App/app/src/main/res/layout/activity_login.xml" value="0.26875" />
+        <entry key="..\:/Users/Huy/Documents/Yup_App/Yup_App/app/src/main/res/layout/activity_login_legacy.xml" value="0.26875" />
+        <entry key="..\:/Users/Huy/Documents/Yup_App/Yup_App/app/src/main/res/layout/activity_register.xml" value="0.26875" />
+        <entry key="..\:/Users/Huy/Documents/Yup_App/Yup_App/app/src/main/res/layout/activity_register_legacy.xml" value="0.26875" />
+        <entry key="..\:/Users/Huy/Documents/Yup_App/Yup_App/app/src/main/res/layout/image_item.xml" value="0.2677083333333333" />
         <entry key="..\:/thiet ke phan mem/YupApp/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1935" />
         <entry key="..\:/thiet ke phan mem/YupApp/app/src/main/res/drawable/login_button_bk.xml" value="0.1935" />
         <entry key="..\:/thiet ke phan mem/YupApp/app/src/main/res/layout/activity_dashboard.xml" value="0.18541666666666667" />
@@ -13,16 +20,6 @@
         <entry key="..\:/thiet ke phan mem/YupApp/app/src/main/res/layout/activity_register_legacy.xml" value="0.18541666666666667" />
         <entry key="..\:/thiet ke phan mem/YupApp/app/src/main/res/layout/layout_login.xml" value="0.17135416666666667" />
         <entry key="..\:/thiet ke phan mem/YupApp/app/src/main/res/layout/layout_register.xml" value="0.18541666666666667" />
-        <entry key="app/src/main/res/drawable/light_border.xml" value="0.326" />
-        <entry key="app/src/main/res/drawable/splash.xml" value="0.1715" />
-        <entry key="app/src/main/res/layout/activity_dashboard.xml" value="0.11850711812235475" />
-        <entry key="app/src/main/res/layout/activity_login.xml" value="0.32447916666666665" />
-        <entry key="app/src/main/res/layout/activity_login_legacy.xml" value="0.15780141843971632" />
-        <entry key="app/src/main/res/layout/activity_login_new.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.32447916666666665" />
-        <entry key="app/src/main/res/layout/activity_register.xml" value="0.32447916666666665" />
-        <entry key="app/src/main/res/layout/activity_register_new.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/splash.xml" value="0.15729483282674772" />
       </map>
     </option>
   </component>

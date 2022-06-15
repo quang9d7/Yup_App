@@ -12,11 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.yup.R;
 
 
-public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHolder> {
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UsersViewHolder> {
 
     private Context mContext = null;
 
-    public UsersAdapter(Context mContext) {
+    public UserAdapter(Context mContext) {
         this.mContext = mContext;
     }
 
@@ -26,7 +26,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
     @Override
     public UsersViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_dashboard, parent, false);
-        return new UsersAdapter.UsersViewHolder(view);
+        return new UserAdapter.UsersViewHolder(view);
     }
 
     @Override
