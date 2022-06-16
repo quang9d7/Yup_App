@@ -1,8 +1,11 @@
 package com.example.yup.adapters;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,16 +18,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.yup.R;
 
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
 
     private ArrayList<Uri> images;
-    private WindowManager windowManager;
+    private Context context;
 
-    public ImageAdapter(ArrayList<Uri> images, WindowManager windowManager) {
+    public ImageAdapter(ArrayList<Uri> images, Context context) {
         this.images = images;
-        this.windowManager = windowManager;
+        this.context = context;
     }
     @NonNull
     @Override
@@ -37,9 +42,16 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ImageAdapter.ViewHolder holder, int position) {
         Uri uri = this.images.get(position);
-        Bitmap myImg = BitmapFactory.decodeFile(uri.getPath());
+        ParcelFileDescriptor parcelFileDescriptor = null;
+        try {
+            parcelFileDescriptor = context.getContentResolver().openFileDescriptor(uri, "r");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+        Bitmap myImg = BitmapFactory.decodeFileDescriptor(fileDescriptor);
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        windowManager.getDefaultDisplay()
+        ((Activity)context).getWindowManager().getDefaultDisplay()
                 .getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;
         holder.imageView.setImageBitmap(scaleBitmapWidth(myImg,width));

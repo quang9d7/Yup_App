@@ -79,7 +79,7 @@ public class DashboardActivity extends AppCompatActivity {
         imageCollection = findViewById(R.id.imageCollection);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         imageCollection.setLayoutManager(layoutManager);
-        imageAdapter = new ImageAdapter(images,getWindowManager());
+        imageAdapter = new ImageAdapter(images,this);
         imageCollection.setAdapter(imageAdapter);
 
         service = Client.createService(ApiService.class);
@@ -128,8 +128,8 @@ public class DashboardActivity extends AppCompatActivity {
             if (data.getClipData() != null) {
                 int x = data.getClipData().getItemCount();
                 for (int i=0; i<x; i++) {
-                    String url = data.getClipData().getItemAt(i).getUri().getPath();
-                    images.add(Uri.parse(url));
+                    Uri uri = data.getClipData().getItemAt(i).getUri();
+                    images.add(uri);
                     imageAdapter.notifyDataSetChanged();
                 }
 
@@ -145,11 +145,12 @@ public class DashboardActivity extends AppCompatActivity {
 
 
 
-                    images.add(Uri.parse(imageUrl));
+                    images.add(data.getData());
                     imageAdapter.notifyDataSetChanged();
 
                     service=Client.createServiceWithAuth(ApiService.class,sessionManager);
                     File file = new File(imageUrl);
+//                    File file = new File(data.getData().getPath());
 //                    RequestBody requestBody = RequestBody.create(MEDIA_TYPE_IMG, file);
 
 
