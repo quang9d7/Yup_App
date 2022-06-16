@@ -20,6 +20,7 @@ import com.example.yup.models.UserCredentials;
 import com.example.yup.utils.ApiService;
 import com.example.yup.utils.Client;
 import com.example.yup.utils.SessionManager;
+import com.example.yup.utils.YupAuth;
 import com.google.common.hash.Hashing;
 import com.squareup.moshi.Moshi;
 
@@ -50,6 +51,8 @@ public class LoginActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +77,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Neu da dang nhap
         if (sessionManager.getToken().getAccessToken() != null) {
+
             Log.w("da dang nhap","OK");
             startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
             finish();
@@ -100,32 +104,22 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     void login(){
-
-
-//            showLoading();
-
             String username = binding.username.getText().toString();
             String password = binding.password.getText().toString();
-
             String hash = Hashing.sha256()
                     .hashString(password, StandardCharsets.UTF_8)
                     .toString();
-
             UserCredentials userCredentials = new UserCredentials(username, hash);
-
             String jsonCredentials = moshi.adapter(UserCredentials.class).toJson(userCredentials);
-
             RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), jsonCredentials);
-
             call = service.login(requestBody);
             call.enqueue(new Callback<TokenPair>() {
                 @Override
                 public void onResponse(Call<TokenPair> call, Response<TokenPair> response) {
-
                     Log.w("YupLogin", "onResponse: " + response);
-
                     if (response.isSuccessful()) {
                         sessionManager.saveToken(response.body());
+                        Log.w("Access_Token_Login",response.body().getAccessToken());
                         sharedPreferences.edit().putString("uid", username);
                         sharedPreferences.edit().apply();
                         startActivity(new Intent(LoginActivity.this, DashboardActivity.class));

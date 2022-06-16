@@ -1,20 +1,32 @@
 package com.example.yup.utils;
 
 import com.example.yup.models.InfoMessage;
+import com.example.yup.models.MyDetectImage;
+import com.example.yup.models.MyImage;
 import com.example.yup.models.TokenPair;
 import com.example.yup.models.UserAccount;
 
+import java.util.Observable;
+
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
+import retrofit2.http.Multipart;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
+
 
 public interface ApiService {
 
@@ -31,30 +43,16 @@ public interface ApiService {
     @GET("auth")
     Call<TokenPair> refresh(@Header("Authorization") String refreshToken);
 
-    @GET("users")
-    Call<UserAccount> getUserProfile(@Query("fetch") String fetch);
 
-//    @GET("users")
-//    Call<UserAccountFull> getUserFull(@Query("fetch") String fetch);
+    @Multipart
+    @POST("detect")
+    Call<MyImage> uploadImage(@Part MultipartBody.Part image);
 
-    // update user
-    @PATCH("users")
+
+
+    @GET("images/{id}")
     @Headers("Content-Type: application/json")
-    Call<InfoMessage> updateUser(@Body RequestBody body);
+    Call<MyDetectImage>getDetectId(@Path("id") String id);
 
-
-
-
-    // dang xuat
-    @DELETE("auth")
-    Call<InfoMessage> logout();
-
-    @POST("users/verify")
-    @Headers("Content-Type: application/json")
-    Call<InfoMessage> verify(@Body RequestBody body);
-
-    @POST("users/verify/resend")
-    @Headers("Content-Type: application/json")
-    Call<InfoMessage> resendVerification(@Body RequestBody body);
 
 }

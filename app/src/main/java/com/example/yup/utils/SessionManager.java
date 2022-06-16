@@ -1,6 +1,7 @@
 package com.example.yup.utils;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.yup.models.TokenPair;
 
@@ -24,6 +25,7 @@ public class SessionManager {
     public void saveToken(TokenPair token){
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("ACCESS_TOKEN", token.getAccessToken());
+        Log.w("Access_token_user",token.getAccessToken());
         editor.putString("REFRESH_TOKEN", token.getRefreshToken());
         editor.apply();
     }
