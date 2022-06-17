@@ -18,6 +18,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -30,6 +31,7 @@ import com.example.yup.adapters.ImageAdapter;
 import com.example.yup.adapters.UserAdapter;
 import com.example.yup.models.ErrorMessage;
 import com.example.yup.models.MyDetectImage;
+import com.example.yup.models.MyDetectInfo;
 import com.example.yup.models.MyImage;
 import com.example.yup.models.TokenPair;
 import com.example.yup.utils.ApiService;
@@ -63,6 +65,7 @@ public class DashboardActivity extends AppCompatActivity {
     ApiService service;
     Call<MyImage> call;
     Call<MyDetectImage>call_detect;
+    Call<MyDetectInfo>call_detail_detect;
     MediaType MEDIA_TYPE_IMG = MediaType.parse("image/*");
     private static final int READ_PERMISSION = 101;
     SessionManager sessionManager;
@@ -140,27 +143,15 @@ public class DashboardActivity extends AppCompatActivity {
                     String deletedStr="/external_files";
                     imageUrl=imageUrl.substring(deletedStr.length());
                     imageUrl=abs_path_storage+imageUrl;
-
                     Log.d("ABS path storage ",imageUrl);
-
-
-
                     images.add(Uri.parse(imageUrl));
                     imageAdapter.notifyDataSetChanged();
-
                     service=Client.createServiceWithAuth(ApiService.class,sessionManager);
                     File file = new File(imageUrl);
-//                    RequestBody requestBody = RequestBody.create(MEDIA_TYPE_IMG, file);
-
-
-
                     RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
                     MultipartBody.Part body = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
-
                     synchronized (this){
-
-
                     call = service.uploadImage(body);
                     call.enqueue(new Callback<MyImage>() {
                         @Override
@@ -178,6 +169,7 @@ public class DashboardActivity extends AppCompatActivity {
                                 try  {
                                     synchronized (this){
                                         this.wait(100000);
+
                                         call_detect = service.getDetectId(id);
                                         call_detect.enqueue(new Callback<MyDetectImage>() {
                                             @Override
@@ -192,6 +184,31 @@ public class DashboardActivity extends AppCompatActivity {
                                                 Log.d("detect_id", result_detect_id);
                                                 Log.d("result_status", result_status);
                                                 Log.d("result_url", result_url);
+                                                call_detail_detect=service.getDetailDetect(result_detect_id);
+                                                call_detail_detect.enqueue(new Callback<MyDetectInfo>() {
+                                                    @Override
+                                                    public void onResponse(Call<MyDetectInfo> call, Response<MyDetectInfo> response) {
+                                                            MyDetectInfo detail=response.body();
+                                                            List<List<List<Float>>>boxes=detail.getBoxes();
+                                                            List<String>texts=detail.getTexts();
+                                                            int n=boxes.size();
+                                                            for(int i=0;i<n;i++){
+                                                                for(int j=0;j<boxes.get(i).size();j++){
+                                                                    Float x_coord=boxes.get(i).get(j).get(0);
+                                                                    Float y_coord=boxes.get(i).get(j).get(1);
+                                                                    Log.d("(x,y)=","("+Float.toString(x_coord)+","+Float.toString(y_coord)+")");
+                                                                    // draw bitmap
+
+                                                                }
+                                                            }
+                                                            
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Call<MyDetectInfo> call, Throwable t) {
+
+                                                    }
+                                                });
                                             }
 
                                             @Override
@@ -199,6 +216,8 @@ public class DashboardActivity extends AppCompatActivity {
                                                 Log.d("detect error", t.toString());
                                             }
                                         });
+
+
                                     }
 
 
@@ -230,6 +249,69 @@ public class DashboardActivity extends AppCompatActivity {
         return bm1;
     }
 
-//    public Bitmap drawBoundingBox(Bitmap bm, ArrayList<>)
+    public class Point {
+
+        public float x = 0;
+        public float y = 0;
+
+        public Point(float x, float y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public void setPoint(Float x,Float y){
+            this.x=x;
+            this.y=y;
+        }
+    }
+
+    private void drawPoly(Canvas canvas, int color, Point[] points) {
+        // line at minimum...
+        if (points.length < 2) {
+            return;
+        }
+
+        // paint
+        Paint polyPaint = new Paint();
+        polyPaint.setColor(color);
+        polyPaint.setStyle(Paint.Style.FILL);
+
+        // path
+        Path polyPath = new Path();
+        polyPath.moveTo(points[0].x, points[0].y);
+        int i, len;
+        len = points.length;
+        for (i = 0; i < len; i++) {
+            polyPath.lineTo(points[i].x, points[i].y);
+        }
+        polyPath.lineTo(points[0].x, points[0].y);
+
+        // draw
+        canvas.drawPath(polyPath, polyPaint);
+    }
+
+
+    public Bitmap drawBoundingBox(Bitmap bm,List<List<List<Float>>>boxes){
+        Bitmap bm1 = bm.copy(bm.getConfig(),true);
+        Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaint.setColor(Color.BLUE);
+        mPaint.setStrokeWidth(30);
+        mPaint.setStyle(Paint.Style.STROKE);
+        Canvas canvas = new Canvas(bm1);
+
+        int n=boxes.size();
+        for(int i=0;i<n;i++){
+            int m=boxes.get(i).size();
+            Point points[]=new Point[m];
+            for(int j=0;j<m;j++){
+                points[i].setPoint(boxes.get(i).get(j).get(0),boxes.get(i).get(j).get(1));
+
+            }
+            drawPoly(canvas,0xFF5555ee,points);
+
+        }
+        return bm1;
+    }
+
 
 }

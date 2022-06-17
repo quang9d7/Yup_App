@@ -2,6 +2,7 @@ package com.example.yup.utils;
 
 import com.example.yup.models.InfoMessage;
 import com.example.yup.models.MyDetectImage;
+import com.example.yup.models.MyDetectInfo;
 import com.example.yup.models.MyImage;
 import com.example.yup.models.TokenPair;
 import com.example.yup.models.UserAccount;
@@ -44,15 +45,24 @@ public interface ApiService {
     Call<TokenPair> refresh(@Header("Authorization") String refreshToken);
 
 
+    // upload image to server to detect
     @Multipart
     @POST("detect")
     Call<MyImage> uploadImage(@Part MultipartBody.Part image);
+    // id message
 
-
-
+    // get info images especially detect_id
     @GET("images/{id}")
     @Headers("Content-Type: application/json")
     Call<MyDetectImage>getDetectId(@Path("id") String id);
+
+    // detect_id
+    @GET("detect/{id}")
+    @Headers("Content-Type: application/json")
+    Call<MyDetectInfo>getDetailDetect(@Path("id") String id);
+
+
+
 
 
 }
