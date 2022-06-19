@@ -1,18 +1,25 @@
 package com.example.yup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -25,6 +32,7 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.yup.adapters.ImageAdapter;
@@ -37,6 +45,8 @@ import com.example.yup.models.TokenPair;
 import com.example.yup.utils.ApiService;
 import com.example.yup.utils.Client;
 import com.example.yup.utils.SessionManager;
+import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -60,7 +70,11 @@ public class DashboardActivity extends AppCompatActivity {
     RecyclerView imageCollection;
     FloatingActionButton pickImageButton;
     ImageAdapter imageAdapter;
-    Button logout_btn;
+    ImageButton logout_btn;
+    BottomAppBar bottomAppBar;
+    NestedScrollView galleryScrollView;
+    LinearLayoutCompat pickImageContextMenu;
+    ExtendedFloatingActionButton pickImgFromStorageBtn, takeImageBtn;
     String abs_path_storage="storage/emulated/0";
     ApiService service;
     Call<MyImage> call;
@@ -78,10 +92,31 @@ public class DashboardActivity extends AppCompatActivity {
 
         pickImageButton = findViewById(R.id.fab);
         logout_btn=findViewById(R.id.logout_btn);
+        bottomAppBar = findViewById(R.id.bottom_app_bar);
+        galleryScrollView = findViewById(R.id.galleryScrollView);
+        pickImageContextMenu = findViewById(R.id.pickImageContextMenu);
+        pickImgFromStorageBtn = findViewById(R.id.pickImageFromStorageBtn);
+        takeImageBtn = findViewById(R.id.takeImageBtn);
 
         imageCollection = findViewById(R.id.imageCollection);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        imageCollection.setLayoutManager(layoutManager);
+        StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        imageCollection.setLayoutManager(gridLayoutManager);
+        imageCollection.setItemAnimator(new DefaultItemAnimator());
+        galleryScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View view, int i, int i1, int i2, int i3) {
+                int dy = i1 - i3;
+                if (dy > 0 && bottomAppBar.getFabAlignmentMode() == BottomAppBar.FAB_ALIGNMENT_MODE_CENTER)
+                {
+                    bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_END);
+                }
+                else if (dy < 0 && bottomAppBar.getFabAlignmentMode() == BottomAppBar.FAB_ALIGNMENT_MODE_END)
+                {
+                    bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER);
+                }
+            }
+        });
+
         imageAdapter = new ImageAdapter(images,this);
         imageCollection.setAdapter(imageAdapter);
 
@@ -102,11 +137,30 @@ public class DashboardActivity extends AppCompatActivity {
         pickImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                FloatingActionButton fab = (FloatingActionButton) view;
+                if (pickImageContextMenu.getVisibility() == View.INVISIBLE) {
+                    pickImageContextMenu.setVisibility(View.VISIBLE);
+                    fab.setImageDrawable(getDrawable(R.drawable.ic_baseline_close_24));
+                    fab.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.red)));
+                } else {
+                    fab.setImageDrawable(getDrawable(R.drawable.ic_baseline_image_24));
+                    fab.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.fabButtonColor)));
+                    pickImageContextMenu.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        pickImgFromStorageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent,"Select images"),1);
+                pickImageButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_image_24));
+                pickImageButton.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.fabButtonColor)));
+                pickImageContextMenu.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -160,87 +214,87 @@ public class DashboardActivity extends AppCompatActivity {
                     RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
                     MultipartBody.Part body = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
-                    synchronized (this){
-                    call = service.uploadImage(body);
-                    call.enqueue(new Callback<MyImage>() {
-                        @Override
-                        public void onResponse(Call<MyImage> call, Response<MyImage> response) {
-                            Log.w("Yup upload image","onResponse"+response);
-                            MyImage info=response.body();
-                            String img_message=info.getMessage();
-                            Log.d("Img_message",img_message);
-                            List<String>ids= info.getId();
-                            int count=0;
-
-                            for (String id: ids){
-                                // get detect image
-                                Log.d("id"+Integer.toString(count++),id);
-                                try  {
-                                    synchronized (this){
-                                        this.wait(100000);
-                                        call_detect = service.getDetectId(id);
-                                        call_detect.enqueue(new Callback<MyDetectImage>() {
-                                            @Override
-                                            public void onResponse(Call<MyDetectImage> call, Response<MyDetectImage> response) {
-                                                MyDetectImage result_detect = response.body();
-                                                String result_id = result_detect.get_id();
-                                                String result_detect_id = result_detect.getDetect_id();
-                                                String result_status = result_detect.getStatus();
-                                                String result_url = result_detect.getUrl();
-
-                                                Log.d("_id", result_id);
-                                                Log.d("detect_id", result_detect_id);
-                                                Log.d("result_status", result_status);
-                                                Log.d("result_url", result_url);
-                                                call_detail_detect=service.getDetailDetect(result_detect_id);
-                                                call_detail_detect.enqueue(new Callback<MyDetectInfo>() {
-                                                    @Override
-                                                    public void onResponse(Call<MyDetectInfo> call, Response<MyDetectInfo> response) {
-                                                            MyDetectInfo detail=response.body();
-                                                            List<List<List<Float>>>boxes=detail.getBoxes();
-                                                            List<String>texts=detail.getTexts();
-                                                            int n=boxes.size();
-                                                            for(int i=0;i<n;i++){
-                                                                for(int j=0;j<boxes.get(i).size();j++){
-                                                                    Float x_coord=boxes.get(i).get(j).get(0);
-                                                                    Float y_coord=boxes.get(i).get(j).get(1);
-                                                                    Log.d("(x,y)=","("+Float.toString(x_coord)+","+Float.toString(y_coord)+")");
-                                                                    // draw bitmap
-
-                                                                }
-                                                            }
-
-                                                    }
-
-                                                    @Override
-                                                    public void onFailure(Call<MyDetectInfo> call, Throwable t) {
-
-                                                    }
-                                                });
-                                            }
-
-                                            @Override
-                                            public void onFailure(Call<MyDetectImage> call, Throwable t) {
-                                                Log.d("detect error", t.toString());
-                                            }
-                                        });
-
-
-                                    }
-
-
-                                    }catch(Exception e){
-                                        e.getStackTrace();
-                                    }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<MyImage> call, Throwable t) {
-                            Log.d("upload image on failure",t.getMessage());
-                        }
-                    });
-            }
+//                    synchronized (this){
+//                    call = service.uploadImage(body);
+//                    call.enqueue(new Callback<MyImage>() {
+//                        @Override
+//                        public void onResponse(Call<MyImage> call, Response<MyImage> response) {
+//                            Log.w("Yup upload image","onResponse"+response);
+//                            MyImage info=response.body();
+//                            String img_message=info.getMessage();
+//                            Log.d("Img_message",img_message);
+//                            List<String>ids= info.getId();
+//                            int count=0;
+//S
+//                            for (String id: ids){
+//                                // get detect image
+//                                Log.d("id"+Integer.toString(count++),id);
+//                                try  {
+//                                    synchronized (this){
+//                                        this.wait(100000);
+//                                        call_detect = service.getDetectId(id);
+//                                        call_detect.enqueue(new Callback<MyDetectImage>() {
+//                                            @Override
+//                                            public void onResponse(Call<MyDetectImage> call, Response<MyDetectImage> response) {
+//                                                MyDetectImage result_detect = response.body();
+//                                                String result_id = result_detect.get_id();
+//                                                String result_detect_id = result_detect.getDetect_id();
+//                                                String result_status = result_detect.getStatus();
+//                                                String result_url = result_detect.getUrl();
+//
+//                                                Log.d("_id", result_id);
+//                                                Log.d("detect_id", result_detect_id);
+//                                                Log.d("result_status", result_status);
+//                                                Log.d("result_url", result_url);
+//                                                call_detail_detect=service.getDetailDetect(result_detect_id);
+//                                                call_detail_detect.enqueue(new Callback<MyDetectInfo>() {
+//                                                    @Override
+//                                                    public void onResponse(Call<MyDetectInfo> call, Response<MyDetectInfo> response) {
+//                                                            MyDetectInfo detail=response.body();
+//                                                            List<List<List<Float>>>boxes=detail.getBoxes();
+//                                                            List<String>texts=detail.getTexts();
+//                                                            int n=boxes.size();
+//                                                            for(int i=0;i<n;i++){
+//                                                                for(int j=0;j<boxes.get(i).size();j++){
+//                                                                    Float x_coord=boxes.get(i).get(j).get(0);
+//                                                                    Float y_coord=boxes.get(i).get(j).get(1);
+//                                                                    Log.d("(x,y)=","("+Float.toString(x_coord)+","+Float.toString(y_coord)+")");
+//                                                                    // draw bitmap
+//
+//                                                                }
+//                                                            }
+//
+//                                                    }
+//
+//                                                    @Override
+//                                                    public void onFailure(Call<MyDetectInfo> call, Throwable t) {
+//
+//                                                    }
+//                                                });
+//                                            }
+//
+//                                            @Override
+//                                            public void onFailure(Call<MyDetectImage> call, Throwable t) {
+//                                                Log.d("detect error", t.toString());
+//                                            }
+//                                        });
+//
+//
+//                                    }
+//
+//
+//                                    }catch(Exception e){
+//                                        e.getStackTrace();
+//                                    }
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Call<MyImage> call, Throwable t) {
+//                            Log.d("upload image on failure",t.getMessage());
+//                        }
+//                    });
+//            }
         }}
     }
 

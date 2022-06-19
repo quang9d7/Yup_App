@@ -14,6 +14,8 @@
     <color name="primaryTextColor">#2661FA</color>
     <color name="loginBkColor">#7E149C</color>
 
-    <!--colros for card-->
+    <!--colors for card-->
     <color name="whiteCardColor">#fff</color>
+    <color name="red">#F05050</color>
+    <color name="fabButtonColor">#0065ff</color>
 </resources>

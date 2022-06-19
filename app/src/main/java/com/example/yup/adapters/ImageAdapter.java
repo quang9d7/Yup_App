@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,8 +54,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity)context).getWindowManager().getDefaultDisplay()
                 .getMetrics(displayMetrics);
-        int width = displayMetrics.widthPixels;
-        holder.imageView.setImageBitmap(scaleBitmapWidth(myImg,width));
+        float dpWidth = (displayMetrics.widthPixels / displayMetrics.density - 50) / 2;
+        int pxWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpWidth, displayMetrics);
+
+        holder.imageView.getLayoutParams().height = (pxWidth * myImg.getHeight()) / myImg.getWidth();
+        holder.imageView.setImageBitmap(scaleBitmapWidth(myImg, pxWidth));
+        holder.imageView.requestLayout();
     }
 
     @Override
@@ -70,7 +75,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         }
     }
     public static Bitmap scaleBitmapWidth(Bitmap bitmap, int width) {
-        float ratio = bitmap.getWidth() / bitmap.getHeight();
         return scaleBitmap(bitmap, width, (width * bitmap.getHeight())
                 / bitmap.getWidth());
     }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Yup</string>
 
     <string name="register">REGISTER</string>
     <string name="login_email_hint">Email</string>
