@@ -3,9 +3,12 @@
 
     <item android:drawable="@color/design_default_color_on_primary" />
 
-    <item>
-    <bitmap
-        android:gravity="center"
-        android:src="@drawable/yup" />
+    <item
+        android:width="300dp"
+        android:height="300dp"
+        android:gravity="center">
+        <bitmap
+            android:gravity="fill_vertical|fill_horizontal"
+            android:src="@drawable/yup" />
     </item>
 </layer-list>

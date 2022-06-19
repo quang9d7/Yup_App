@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.ActivityCompat;
@@ -70,7 +71,7 @@ public class DashboardActivity extends AppCompatActivity {
     RecyclerView imageCollection;
     FloatingActionButton pickImageButton;
     ImageAdapter imageAdapter;
-    ImageButton logout_btn;
+    AppCompatImageButton logout_btn;
     BottomAppBar bottomAppBar;
     NestedScrollView galleryScrollView;
     LinearLayoutCompat pickImageContextMenu;
