@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
+
 }
+apply plugin: 'realm-android'
 
 android {
     compileSdk 32
@@ -47,7 +49,10 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
     implementation 'com.google.guava:guava:31.0.1-android'
 
+    // uplaod
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
+    implementation 'com.ea.async:ea-async:1.2.3'
 
 
 

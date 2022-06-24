@@ -6,6 +6,7 @@ import com.example.yup.models.MyDetectInfo;
 import com.example.yup.models.MyImage;
 import com.example.yup.models.TokenPair;
 import com.example.yup.models.UserAccount;
+import com.example.yup.models.UserInfo;
 
 import java.util.Observable;
 
@@ -60,6 +61,16 @@ public interface ApiService {
     @GET("detect/{id}")
     @Headers("Content-Type: application/json")
     Call<MyDetectInfo>getDetailDetect(@Path("id") String id);
+
+    @GET("users")
+    @Headers("Content-Type:application/json")
+    Call<UserInfo>getUserInfo();
+
+
+    //delete images
+    @DELETE("images/{image_id}")
+    @Headers("Content-Type:application/json")
+    Call<InfoMessage>deleteImage();
 
 
 
