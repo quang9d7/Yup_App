@@ -181,15 +181,16 @@ public class DashboardActivity extends AppCompatActivity {
                 }
             }
         });
-        loadImage_btn.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onClick(View v) {
-
-                loadUserStorage();
-
-            }
-        });
+//        loadImage_btn.setOnClickListener(new View.OnClickListener() {
+//            @SuppressLint("NotifyDataSetChanged")
+//            @Override
+//            public void onClick(View v) {
+//
+//
+//
+//            }
+//        });
+        loadUserStorage();
 
         pickImgFromStorageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
