@@ -38,7 +38,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     private ArrayList<Uri> images;
     private Context context;
-    private ArrayList<String>detect_ids;
+    private ArrayList<String> detect_ids;
 
 
     public ImageAdapter(ArrayList<Uri> images, Context context) {
@@ -46,7 +46,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.context = context;
     }
 
-    public ImageAdapter(ArrayList<String> detect_ids,ArrayList<Uri> images, Context context) {
+    public ImageAdapter(ArrayList<String> detect_ids, ArrayList<Uri> images, Context context) {
         this.images = images;
         this.context = context;
         this.detect_ids = detect_ids;
@@ -64,17 +64,18 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ImageAdapter.ViewHolder holder, int position) {
 
         Uri uri = this.images.get(position);
-        String detect_id=this.detect_ids.get(position);
+        String detect_id = this.detect_ids.get(position);
         Bitmap myImg = null;
         Log.d("uri is ", uri.toString());
         if (uri.toString().startsWith("http")) {
             try {
 
-                DownloadImage downloadImage=new DownloadImage(uri.toString());
-                Thread thread=new Thread(downloadImage);
-                thread.start();;
+                DownloadImage downloadImage = new DownloadImage(uri.toString());
+                Thread thread = new Thread(downloadImage);
+                thread.start();
+                ;
                 thread.join();
-                myImg=downloadImage.getBm();
+                myImg = downloadImage.getBm();
                 DisplayMetrics displayMetrics = new DisplayMetrics();
                 ((Activity) context).getWindowManager().getDefaultDisplay()
                         .getMetrics(displayMetrics);
@@ -84,56 +85,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 holder.imageView.getLayoutParams().height = (pxWidth * myImg.getHeight()) / myImg.getWidth();
                 holder.imageView.setImageBitmap(scaleBitmapWidth(myImg, pxWidth));
                 holder.imageView.requestLayout();
-
-
-//                Runnable runnable=new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try {
-////                            Bitmap mBitmap=Picasso.get().load(uri.toString()).get();
-////                            DisplayMetrics displayMetrics = new DisplayMetrics();
-////                            ((Activity) context).getWindowManager().getDefaultDisplay()
-////                                    .getMetrics(displayMetrics);
-////                            float dpWidth = (displayMetrics.widthPixels / displayMetrics.density - 50) / 2;
-////                            int pxWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpWidth, displayMetrics);
-////
-////                            holder.imageView.getLayoutParams().height = (pxWidth * mBitmap.getHeight()) / mBitmap.getWidth();
-////                            holder.imageView.setImageBitmap(scaleBitmapWidth(mBitmap, pxWidth));
-////                            holder.imageView.requestLayout();
-////                            holder.status.setText("Done");
-//
-//
-//
-//                        } catch (Exception e) {
-//                            Log.d("error new thread", "error");
-//                        }
-
-
-//                };
-//                Thread a = new Thread(() -> {
-//                    try {
-//                        Bitmap mBitmap=Picasso.get().load(uri.toString()).get();
-//                        DisplayMetrics displayMetrics = new DisplayMetrics();
-//                        ((Activity) context).getWindowManager().getDefaultDisplay()
-//                                .getMetrics(displayMetrics);
-//                        float dpWidth = (displayMetrics.widthPixels / displayMetrics.density - 50) / 2;
-//                        int pxWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpWidth, displayMetrics);
-//
-//                        holder.imageView.getLayoutParams().height = (pxWidth * mBitmap.getHeight()) / mBitmap.getWidth();
-//                        holder.imageView.setImageBitmap(scaleBitmapWidth(mBitmap, pxWidth));
-//                        holder.imageView.requestLayout();
-//                        holder.status.setText("Done");
-//
-//
-//                    } catch (Exception e) {
-//                        Log.d("error new thread", "error");
-//                    }
-//                });
-
-//                a.start();
-
-
-//              myImg=BitmapFactory.decodeStream((InputStream)new URL(uri.toString()).getContent());
+                holder.status.setText("Done");
             } catch (Exception e) {
                 Log.d("bitmap error", "err");
                 e.getStackTrace();
@@ -171,8 +123,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(context, TempActivity.class);
-                intent.putExtra("detect_id",detect_id);
+                Intent intent = new Intent(context, TempActivity.class);
+                intent.putExtra("detect_id", detect_id);
                 context.startActivity(intent);
             }
         });
