@@ -47,9 +47,9 @@ public interface ApiService {
 
 
     // upload image to server to detect
-    @Multipart
     @POST("detect")
-    Call<MyImage> uploadImage(@Part MultipartBody.Part image);
+    @Headers("Content-Type: application/json")
+    Call<MyImage> uploadImage(@Body RequestBody body);
     // id message
 
     // get info images especially detect_id

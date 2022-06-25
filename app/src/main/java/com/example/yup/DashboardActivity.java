@@ -6,6 +6,7 @@ import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,10 +15,14 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -26,11 +31,15 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.example.yup.adapters.ImageAdapter;
 import com.example.yup.models.MyDetectImage;
@@ -46,9 +55,15 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Timer;
@@ -82,6 +97,7 @@ public class DashboardActivity extends AppCompatActivity {
     BottomAppBar bottomAppBar;
     NestedScrollView galleryScrollView;
     LinearLayoutCompat pickImageContextMenu;
+    ProgressBar progressBar;
     ExtendedFloatingActionButton pickImgFromStorageBtn, takeImageBtn;
     String abs_path_storage = "storage/emulated/0";
     ApiService service;
@@ -90,6 +106,7 @@ public class DashboardActivity extends AppCompatActivity {
     SessionManager sessionManager;
     SharedPreferences sharedPreferences;
     Realm backgroundThreadRealm;
+    Uri tempImageUri;
 
 
     private static final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
@@ -133,6 +150,7 @@ public class DashboardActivity extends AppCompatActivity {
         pickImageContextMenu = findViewById(R.id.pickImageContextMenu);
         pickImgFromStorageBtn = findViewById(R.id.pickImageFromStorageBtn);
         takeImageBtn = findViewById(R.id.takeImageBtn);
+        progressBar = findViewById(R.id.progressBar);
 
         imageCollection = findViewById(R.id.imageCollection);
         StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
@@ -206,6 +224,21 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
+        takeImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                try {
+                    createImageFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImageUri);
+
+                startActivityForResult(intent, 2);
+            }
+        });
+
         logout_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -216,6 +249,16 @@ public class DashboardActivity extends AppCompatActivity {
         });
     }
 
+    void hideProgressBar() {
+        progressBar.setVisibility(View.GONE);
+        imageCollection.setVisibility(View.VISIBLE);
+    }
+
+    void showProgressBar() {
+        imageCollection.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
     public void loadUserStorage() {
 
         Realm realm = Realm.getDefaultInstance();
@@ -223,11 +266,13 @@ public class DashboardActivity extends AppCompatActivity {
         realm.deleteAll();
         realm.commitTransaction();
         Call<UserInfo> call = service.getUserInfo();
+        showProgressBar();
         call.enqueue(new Callback<UserInfo>() {
             @Override
             public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
                 if (response.isSuccessful()) {
                     List<String> ids = response.body().getImages();
+                    int lastItem = ids.size() - 1;
                     for (String id : ids) {
                         Call<MyDetectImage> call_detect = service.getDetectId(id);
                         call_detect.enqueue(new Callback<MyDetectImage>() {
@@ -246,11 +291,12 @@ public class DashboardActivity extends AppCompatActivity {
                                     images.add(Uri.parse(url));
                                     detect_ids.add(id_detect);
                                     imageAdapter.notifyDataSetChanged();
-
+                                    if (ids.indexOf(id) == lastItem) {
+                                        hideProgressBar();
+                                    }
                                 } else {
                                     Log.d("Error while getting access to ", id);
                                 }
-
                             }
 
                             @Override
@@ -269,11 +315,36 @@ public class DashboardActivity extends AppCompatActivity {
         });
     }
 
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        tempImageUri = FileProvider.getUriForFile(getApplicationContext(), getPackageName()+".provider", image);
+        return image;
+    }
+
+    private String getRealPathFromURI(Uri contentUri, Context context) {
+        String[] proj = {MediaStore.Images.Media.DATA};
+        CursorLoader loader = new CursorLoader(context, contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+
+        cursor.moveToFirst();
+        String result = cursor.getString(columnIndex);
+        cursor.close();
+        return result;
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == 1 && resultCode == RESULT_OK) {
             if (data.getClipData() != null) {
                 int x = data.getClipData().getItemCount();
@@ -284,23 +355,19 @@ public class DashboardActivity extends AppCompatActivity {
                 }
 
             } else if (data.getData() != null) {
-
-                String imageUrl = data.getData().getPath();
-                String deletedStr = "/external_files";
-                imageUrl = imageUrl.substring(deletedStr.length());
-                imageUrl = abs_path_storage + imageUrl;
-
-                Log.d("ABS path storage ", imageUrl);
-
-
-                images.add(data.getData());
-                imageAdapter.notifyDataSetChanged();
-                File file = new File(imageUrl);
-
-
-                RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-
-                MultipartBody.Part body = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
+                ContentResolver cr = getContentResolver();
+                Uri imageUri = data.getData();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    Bitmap bitmap = android.provider.MediaStore.Images.Media
+                            .getBitmap(cr, imageUri);
+                    images.add(imageUri);
+                    imageAdapter.notifyDataSetChanged();
+                    jsonObject.put("base64", bitmap2Base64(bitmap));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                RequestBody body = RequestBody.create(MediaType.parse("text/plain"), jsonObject.toString());
                 synchronized (this) {
                     call = service.uploadImage(body);
                     call.enqueue(new Callback<MyImage>() {
@@ -328,6 +395,49 @@ public class DashboardActivity extends AppCompatActivity {
                         }
                     });
                 }
+            }
+        } else if (requestCode == 2 && resultCode == RESULT_OK) {
+            getContentResolver().notifyChange(tempImageUri, null);
+            ContentResolver cr = getContentResolver();
+            Bitmap bitmap;
+            try {
+                bitmap = android.provider.MediaStore.Images.Media
+                        .getBitmap(cr, tempImageUri);
+                images.add(tempImageUri);
+                imageAdapter.notifyDataSetChanged();
+
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("base64", bitmap2Base64(bitmap));
+                RequestBody body = RequestBody.create(MediaType.parse("text/plain"), jsonObject.toString());
+                synchronized (this) {
+                    call = service.uploadImage(body);
+                    call.enqueue(new Callback<MyImage>() {
+                        @Override
+                        public void onResponse(Call<MyImage> call, Response<MyImage> response) {
+                            Log.w("Yup upload image", "onResponse" + response);
+                            MyImage info = response.body();
+                            List<String> ids = new ArrayList<>();
+                            if (response.isSuccessful()) {
+                                ids = info.getId();
+                            }
+
+                            int count = 0;
+
+                            for (String id : ids) {
+                                // get detect image
+                                Log.d("id" + Integer.toString(count++), id);
+                            }
+                        }
+
+
+                        @Override
+                        public void onFailure(Call<MyImage> call, Throwable t) {
+                            Log.d("upload image on failure", t.getMessage());
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                Log.e("Camera", e.toString());
             }
         }
     }

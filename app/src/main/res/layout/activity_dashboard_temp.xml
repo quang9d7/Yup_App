@@ -54,17 +54,27 @@
         <androidx.core.widget.NestedScrollView
             android:id="@+id/galleryScrollView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/imageCollection"
-                android:paddingHorizontal="15dp"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="70dp"
-                />
+                android:animateLayoutChanges="true">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/imageCollection"
+                    android:paddingHorizontal="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="70dp"
+                    android:visibility="gone"
+                    />
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:indeterminateOnly="true"
+                    android:indeterminateTint="@color/fabButtonColor"
+                    android:visibility="visible"/>
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.core.widget.NestedScrollView>
 
