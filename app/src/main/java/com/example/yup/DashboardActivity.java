@@ -89,7 +89,7 @@ public class DashboardActivity extends AppCompatActivity {
 
 
     ArrayList<Uri> images = new ArrayList<>();
-    ArrayList<String>detect_ids=new ArrayList<>();
+    ArrayList<String>image_ids=new ArrayList<>();
     RecyclerView imageCollection;
     FloatingActionButton pickImageButton;
     ImageAdapter imageAdapter;
@@ -99,7 +99,6 @@ public class DashboardActivity extends AppCompatActivity {
     LinearLayoutCompat pickImageContextMenu;
     ProgressBar progressBar;
     ExtendedFloatingActionButton pickImgFromStorageBtn, takeImageBtn;
-    String abs_path_storage = "storage/emulated/0";
     ApiService service;
     Call<MyImage> call;
     private static final int READ_PERMISSION = 101;
@@ -169,12 +168,11 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
-        imageAdapter = new ImageAdapter(detect_ids,images, this);
+        imageAdapter = new ImageAdapter(image_ids,images, this);
         imageCollection.setAdapter(imageAdapter);
 
         sharedPreferences = getSharedPreferences(getResources().getString(R.string.yup_sp), MODE_PRIVATE);
         sessionManager = SessionManager.getInstance(sharedPreferences);
-        service = Client.createService(ApiService.class);
         service = Client.createServiceWithAuth(ApiService.class, sessionManager);
 
         if (ContextCompat.checkSelfPermission
@@ -281,15 +279,15 @@ public class DashboardActivity extends AppCompatActivity {
 
                                 if (res.isSuccessful()) {
                                     MyDetectImage myDetectImage = res.body();
-                                    String id_detect = myDetectImage.getDetect_id();
+                                    String id_image = myDetectImage.get_id();
                                     String url = myDetectImage.getUrl();
 
-                                    RealmImage obj = new RealmImage(id, id_detect, url, "Done");
+                                    RealmImage obj = new RealmImage(id, id_image, url, "Done");
                                     backgroundThreadRealm.executeTransactionAsync(transactionRealm -> {
                                         transactionRealm.insert(obj);
                                     });
                                     images.add(Uri.parse(url));
-                                    detect_ids.add(id_detect);
+                                    image_ids.add(id_image);
                                     imageAdapter.notifyDataSetChanged();
                                     if (ids.indexOf(id) == lastItem) {
                                         hideProgressBar();
@@ -351,6 +349,8 @@ public class DashboardActivity extends AppCompatActivity {
                 for (int i = 0; i < x; i++) {
                     Uri uri = data.getClipData().getItemAt(i).getUri();
                     images.add(uri);
+                    // insert null to reserve the corresponding images
+                    image_ids.add(null);
                     imageAdapter.notifyDataSetChanged();
                 }
 
@@ -362,6 +362,8 @@ public class DashboardActivity extends AppCompatActivity {
                     Bitmap bitmap = android.provider.MediaStore.Images.Media
                             .getBitmap(cr, imageUri);
                     images.add(imageUri);
+                    // insert null to reserve the corresponding images
+                    image_ids.add(null);
                     imageAdapter.notifyDataSetChanged();
                     jsonObject.put("base64", bitmap2Base64(bitmap));
                 } catch (Exception e) {
@@ -404,6 +406,8 @@ public class DashboardActivity extends AppCompatActivity {
                 bitmap = android.provider.MediaStore.Images.Media
                         .getBitmap(cr, tempImageUri);
                 images.add(tempImageUri);
+                // insert null to reserve the corresponding images
+                image_ids.add(null);
                 imageAdapter.notifyDataSetChanged();
 
                 JSONObject jsonObject = new JSONObject();

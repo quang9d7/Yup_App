@@ -19,4 +19,5 @@
     <color name="red">#F05050</color>
     <color name="fabButtonColor">#0065ff</color>
     <color name="completeColor">#00BFA5</color>
+    <color name="light_gray">#ECECEC</color>
 </resources>

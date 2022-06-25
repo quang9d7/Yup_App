@@ -36,7 +36,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     private ArrayList<Uri> images;
     private Context context;
-    private ArrayList<String> detect_ids;
+    private ArrayList<String> image_ids;
 
 
     public ImageAdapter(ArrayList<Uri> images, Context context) {
@@ -44,10 +44,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.context = context;
     }
 
-    public ImageAdapter(ArrayList<String> detect_ids, ArrayList<Uri> images, Context context) {
+    public ImageAdapter(ArrayList<String> image_ids, ArrayList<Uri> images, Context context) {
         this.images = images;
         this.context = context;
-        this.detect_ids = detect_ids;
+        this.image_ids = image_ids;
     }
 
     @NonNull
@@ -65,7 +65,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         Bitmap myImg = null;
         Log.d("uri is ", uri.toString());
         if (uri.toString().startsWith("http")) {
-            String detect_id = this.detect_ids.get(position);
+            String image_id = this.image_ids.get(position);
             try {
 
                 DownloadImage downloadImage = new DownloadImage(uri.toString());
@@ -96,7 +96,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, EditorActivity.class);
-                    intent.putExtra("detect_id", detect_id);
+                    intent.putExtra("image_id", image_id);
                     context.startActivity(intent);
                 }
             });

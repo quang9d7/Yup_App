@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.11851851851851852" />
         <entry key="..\:/Users/Huy/Documents/Yup_App/Yup_App/app/src/main/res/layout/activity_dashboard.xml" value="0.26875" />
         <entry key="..\:/Users/Huy/Documents/Yup_App/Yup_App/app/src/main/res/layout/activity_dashboard_temp.xml" value="0.26875" />
         <entry key="..\:/Users/Huy/Documents/Yup_App/Yup_App/app/src/main/res/layout/activity_login.xml" value="0.26875" />
@@ -28,6 +29,7 @@
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.15780141843971632" />
         <entry key="app/src/main/res/layout/activity_register_legacy.xml" value="0.1286231884057971" />
         <entry key="app/src/main/res/layout/activity_temp.xml" value="0.15780141843971632" />
+        <entry key="app/src/main/res/layout/dialog_result.xml" value="0.5463576158940397" />
         <entry key="app/src/main/res/layout/image_item.xml" value="0.33" />
         <entry key="app/src/main/res/xml/provider_paths.xml" value="0.125" />
       </map>
