@@ -20,4 +20,5 @@
     <color name="fabButtonColor">#0065ff</color>
     <color name="completeColor">#00BFA5</color>
     <color name="light_gray">#ECECEC</color>
+    <color name="gray">#C5C5C5</color>
 </resources>

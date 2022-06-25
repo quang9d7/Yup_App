@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+        <item
+            android:id="@+id/nav_sync"
+            android:icon="@drawable/ic_baseline_cloud_download_24"
+            android:title="Đồng bộ" />
+        <item
+            android:id="@+id/nav_signout"
+            android:icon="@drawable/ic_baseline_exit_to_app_24"
+            android:title="Đăng xuất" />
+</menu>

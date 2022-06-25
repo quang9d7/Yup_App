@@ -1,5 +1,6 @@
 package com.example.yup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageButton;
@@ -8,6 +9,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.widget.NestedScrollView;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -37,9 +39,12 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.yup.adapters.ImageAdapter;
 import com.example.yup.models.MyDetectImage;
@@ -51,8 +56,10 @@ import com.example.yup.utils.ApiService;
 import com.example.yup.utils.Client;
 import com.example.yup.utils.SessionManager;
 import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 
 
 import org.json.JSONException;
@@ -93,10 +100,12 @@ public class DashboardActivity extends AppCompatActivity {
     RecyclerView imageCollection;
     FloatingActionButton pickImageButton;
     ImageAdapter imageAdapter;
-    AppCompatImageButton logout_btn, loadImage_btn;
     BottomAppBar bottomAppBar;
     NestedScrollView galleryScrollView;
     LinearLayoutCompat pickImageContextMenu;
+    NavigationView navigationView;
+    DrawerLayout drawerLayout;
+    TextView fullNameTextview;
     ProgressBar progressBar;
     ExtendedFloatingActionButton pickImgFromStorageBtn, takeImageBtn;
     ApiService service;
@@ -142,14 +151,32 @@ public class DashboardActivity extends AppCompatActivity {
 
 
         pickImageButton = findViewById(R.id.fab);
-        logout_btn = findViewById(R.id.logout_btn);
-        loadImage_btn = findViewById(R.id.loadImage_btn);
         bottomAppBar = findViewById(R.id.bottom_app_bar);
         galleryScrollView = findViewById(R.id.galleryScrollView);
         pickImageContextMenu = findViewById(R.id.pickImageContextMenu);
         pickImgFromStorageBtn = findViewById(R.id.pickImageFromStorageBtn);
         takeImageBtn = findViewById(R.id.takeImageBtn);
         progressBar = findViewById(R.id.progressBar);
+        drawerLayout = findViewById(R.id.drawerLayout);
+        navigationView = findViewById(R.id.nav_view);
+        View header = navigationView.getHeaderView(0);
+        fullNameTextview = header.findViewById(R.id.fullname);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.nav_signout) {
+                    sessionManager.deleteToken();
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                    return true;
+                } else if (id == R.id.nav_sync) {
+                    loadUserStorage();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         imageCollection = findViewById(R.id.imageCollection);
         StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
@@ -197,15 +224,7 @@ public class DashboardActivity extends AppCompatActivity {
                 }
             }
         });
-//        loadImage_btn.setOnClickListener(new View.OnClickListener() {
-//            @SuppressLint("NotifyDataSetChanged")
-//            @Override
-//            public void onClick(View v) {
-//
-//
-//
-//            }
-//        });
+
         loadUserStorage();
 
         pickImgFromStorageBtn.setOnClickListener(new View.OnClickListener() {
@@ -236,13 +255,15 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivityForResult(intent, 2);
             }
         });
-
-        logout_btn.setOnClickListener(new View.OnClickListener() {
+        bottomAppBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                sessionManager.deleteToken();
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
+            public void onClick(View view) {
+                if (drawerLayout.isOpen()) {
+                    drawerLayout.closeDrawer(Gravity.LEFT);
+                }
+                else {
+                    drawerLayout.openDrawer(Gravity.LEFT);
+                }
             }
         });
     }
@@ -270,6 +291,7 @@ public class DashboardActivity extends AppCompatActivity {
             public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
                 if (response.isSuccessful()) {
                     List<String> ids = response.body().getImages();
+                    fullNameTextview.setText(response.body().getName());
                     int lastItem = ids.size() - 1;
                     for (String id : ids) {
                         Call<MyDetectImage> call_detect = service.getDetectId(id);

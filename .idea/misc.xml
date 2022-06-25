@@ -31,6 +31,8 @@
         <entry key="app/src/main/res/layout/activity_temp.xml" value="0.15780141843971632" />
         <entry key="app/src/main/res/layout/dialog_result.xml" value="0.5463576158940397" />
         <entry key="app/src/main/res/layout/image_item.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/nav_header.xml" value="0.159375" />
+        <entry key="app/src/main/res/menu/drawer_view.xml" value="0.33" />
         <entry key="app/src/main/res/xml/provider_paths.xml" value="0.125" />
       </map>
     </option>
