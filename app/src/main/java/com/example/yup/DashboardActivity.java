@@ -195,7 +195,7 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
-        imageAdapter = new ImageAdapter(image_ids,images, this);
+        imageAdapter = new ImageAdapter(image_ids,images,service, this);
         imageCollection.setAdapter(imageAdapter);
 
         sharedPreferences = getSharedPreferences(getResources().getString(R.string.yup_sp), MODE_PRIVATE);
@@ -385,8 +385,8 @@ public class DashboardActivity extends AppCompatActivity {
                             .getBitmap(cr, imageUri);
                     images.add(imageUri);
                     // insert null to reserve the corresponding images
-                    image_ids.add(null);
-                    imageAdapter.notifyDataSetChanged();
+//                    image_ids.add(null);
+//                    imageAdapter.notifyDataSetChanged();
                     jsonObject.put("base64", bitmap2Base64(bitmap));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -395,24 +395,24 @@ public class DashboardActivity extends AppCompatActivity {
                 synchronized (this) {
                     call = service.uploadImage(body);
                     call.enqueue(new Callback<MyImage>() {
+                        @SuppressLint("NotifyDataSetChanged")
                         @Override
                         public void onResponse(Call<MyImage> call, Response<MyImage> response) {
                             Log.w("Yup upload image", "onResponse" + response);
-                            MyImage info = response.body();
-                            List<String> ids = new ArrayList<>();
-                            if (response.isSuccessful()) {
-                                ids = info.getId();
+                            if(response.isSuccessful()){
+                                MyImage info = response.body();
+                                List<String> ids = info.getId();
+                                for (String id : ids) {
+                                    // get detect image
+                                    Log.d("image_id is",id);
+                                    image_ids.add(id);
+                                    imageAdapter.notifyDataSetChanged();
+
+                                }
+
                             }
 
-                            int count = 0;
-
-                            for (String id : ids) {
-                                // get detect image
-                                Log.d("id" + Integer.toString(count++), id);
-                            }
                         }
-
-
                         @Override
                         public void onFailure(Call<MyImage> call, Throwable t) {
                             Log.d("upload image on failure", t.getMessage());

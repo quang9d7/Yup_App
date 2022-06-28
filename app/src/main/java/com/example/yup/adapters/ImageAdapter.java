@@ -3,6 +3,7 @@ package com.example.yup.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -24,6 +26,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.yup.EditorActivity;
 import com.example.yup.R;
 import com.example.yup.models.DownloadImage;
+import com.example.yup.models.MyDetectImage;
+import com.example.yup.utils.ApiService;
+import com.example.yup.utils.Client;
+import com.example.yup.utils.SessionManager;
 
 
 import java.io.FileDescriptor;
@@ -31,12 +37,19 @@ import java.io.FileNotFoundException;
 
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
 
     private ArrayList<Uri> images;
     private Context context;
     private ArrayList<String> image_ids;
+    private ApiService service;
+    SessionManager sessionManager;
+    SharedPreferences sharedPreferences;
 
 
     public ImageAdapter(ArrayList<Uri> images, Context context) {
@@ -44,10 +57,14 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.context = context;
     }
 
-    public ImageAdapter(ArrayList<String> image_ids, ArrayList<Uri> images, Context context) {
+    public ImageAdapter(ArrayList<String> image_ids, ArrayList<Uri> images, ApiService service, Context context) {
         this.images = images;
         this.context = context;
         this.image_ids = image_ids;
+        sharedPreferences = context.getSharedPreferences(context.getResources().getString(R.string.yup_sp), 0);
+        sessionManager = SessionManager.getInstance(sharedPreferences);
+        this.service = Client.createServiceWithAuth(ApiService.class, sessionManager);
+
     }
 
     @NonNull
@@ -64,8 +81,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         Uri uri = this.images.get(position);
         Bitmap myImg = null;
         Log.d("uri is ", uri.toString());
+        String image_id = this.image_ids.get(position);
+//        Log.d("image_id is",image_id);
         if (uri.toString().startsWith("http")) {
-            String image_id = this.image_ids.get(position);
+
             try {
 
                 DownloadImage downloadImage = new DownloadImage(uri.toString());
@@ -92,14 +111,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 e.printStackTrace();
             }
 
-            holder.imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, EditorActivity.class);
-                    intent.putExtra("image_id", image_id);
-                    context.startActivity(intent);
-                }
-            });
 
         } else {
             ParcelFileDescriptor parcelFileDescriptor = null;
@@ -129,6 +140,53 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             Log.d("no_bitmap", "a");
         }
 
+
+        if (holder.status.getText().toString().equals("Hoàn thành")) {
+            holder.imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, EditorActivity.class);
+                    intent.putExtra("image_id", image_id);
+                    context.startActivity(intent);
+                }
+            });
+
+        } else {
+            holder.imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("image_id dang xu ly",image_id);
+                    Call<MyDetectImage> call_de = service.getDetectId(image_id);
+                    call_de.enqueue(new Callback<MyDetectImage>() {
+                        @Override
+                        public void onResponse(Call<MyDetectImage> call, Response<MyDetectImage> response) {
+                            if (response.isSuccessful()) {
+
+                                String status_now = response.body().getStatus();
+                                if (status_now.equals("Done")) {
+                                    holder.status.setText("Hoàn thành");
+                                    holder.status.setTextColor(context.getColor(R.color.completeColor));
+                                    holder.statusIcon.setImageTintList(ColorStateList.valueOf(context.getColor(R.color.completeColor)));
+                                    holder.statusIcon.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_stars_24));
+
+                                    Intent intent = new Intent(context, EditorActivity.class);
+                                    intent.putExtra("image_id", image_id);
+                                    context.startActivity(intent);
+
+                                } else {
+                                    Toast.makeText(context, "Dang xu ly hinh anh nay", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<MyDetectImage> call, Throwable t) {
+                            t.getStackTrace();
+                        }
+                    });
+                }
+            });
+        }
 
     }
 
