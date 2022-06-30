@@ -385,7 +385,7 @@ public class DashboardActivity extends AppCompatActivity {
                             .getBitmap(cr, imageUri);
                     images.add(imageUri);
                     // insert null to reserve the corresponding images
-//                    image_ids.add(null);
+             //       image_ids.add(null);
 //                    imageAdapter.notifyDataSetChanged();
                     jsonObject.put("base64", bitmap2Base64(bitmap));
                 } catch (Exception e) {
@@ -438,20 +438,19 @@ public class DashboardActivity extends AppCompatActivity {
                 synchronized (this) {
                     call = service.uploadImage(body);
                     call.enqueue(new Callback<MyImage>() {
+                        @SuppressLint("NotifyDataSetChanged")
                         @Override
                         public void onResponse(Call<MyImage> call, Response<MyImage> response) {
                             Log.w("Yup upload image", "onResponse" + response);
+
                             MyImage info = response.body();
-                            List<String> ids = new ArrayList<>();
-                            if (response.isSuccessful()) {
-                                ids = info.getId();
-                            }
-
-                            int count = 0;
-
+                            List<String> ids = info.getId();
                             for (String id : ids) {
                                 // get detect image
-                                Log.d("id" + Integer.toString(count++), id);
+                                Log.d("image_id is",id);
+                                image_ids.add(id);
+                                imageAdapter.notifyDataSetChanged();
+
                             }
                         }
 

@@ -50,9 +50,6 @@ public class LoginActivity extends AppCompatActivity {
     Moshi moshi = new Moshi.Builder().build();
     SharedPreferences sharedPreferences;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

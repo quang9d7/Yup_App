@@ -70,7 +70,7 @@ public interface ApiService {
     //delete images
     @DELETE("images/{image_id}")
     @Headers("Content-Type:application/json")
-    Call<InfoMessage>deleteImage();
+    Call<InfoMessage>deleteImage(@Path("image_id") String image_id);
 
 
 

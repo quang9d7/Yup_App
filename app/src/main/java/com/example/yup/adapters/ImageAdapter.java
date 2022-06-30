@@ -147,6 +147,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 public void onClick(View v) {
                     Intent intent = new Intent(context, EditorActivity.class);
                     intent.putExtra("image_id", image_id);
+
                     context.startActivity(intent);
                 }
             });

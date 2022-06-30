@@ -1,5 +1,6 @@
 package com.example.yup;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.method.CharacterPickerDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -16,11 +18,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.content.FileProvider;
 
 import com.example.yup.models.DownloadImage;
+import com.example.yup.models.InfoMessage;
 import com.example.yup.models.MyDetectImage;
 import com.example.yup.models.MyDetectInfo;
 import com.example.yup.utils.ApiService;
@@ -28,6 +32,8 @@ import com.example.yup.utils.Client;
 import com.example.yup.utils.ImageDrawView;
 import com.example.yup.utils.Point;
 import com.example.yup.utils.SessionManager;
+
+import org.checkerframework.checker.units.qual.C;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,6 +50,7 @@ import retrofit2.Response;
 public class EditorActivity extends AppCompatActivity {
     AppCompatImageButton saveImageBtn;
     AppCompatImageButton shareBtn;
+    AppCompatImageButton deleteImageBtn;
     ImageDrawView imageDrawView;
     ProgressBar progressBar;
     ApiService service;
@@ -74,6 +81,7 @@ public class EditorActivity extends AppCompatActivity {
         saveImageBtn = findViewById(R.id.saveImageBtn);
         shareBtn = findViewById(R.id.shareBtn);
         progressBar = findViewById(R.id.progressBar);
+        deleteImageBtn=findViewById(R.id.deleteBtn);
         showProgressBar();
         Call<MyDetectImage> call_detect = service.getDetectId(detect_id);
         call_detect.enqueue(new Callback<MyDetectImage>() {
@@ -121,6 +129,54 @@ public class EditorActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<MyDetectImage> call, Throwable t) {
 
+            }
+        });
+        deleteImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog alertDialog = new AlertDialog.Builder(EditorActivity.this)
+//set icon
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+//set title
+                        .setTitle("Are you sure?")
+//set message
+                        .setMessage("Delete Image")
+//set positive button
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //set what would happen when positive button is clicked
+                                Call<InfoMessage>call_delete=service.deleteImage(detect_id);
+                                call_delete.enqueue(new Callback<InfoMessage>() {
+                                    @Override
+                                    public void onResponse(Call<InfoMessage> call, Response<InfoMessage> response) {
+                                        if(response.isSuccessful()){
+                                            String message=response.body().getMessage();
+
+                                            Toast.makeText(EditorActivity.this,message,Toast.LENGTH_LONG).show();
+                                            Intent intent1=new Intent(EditorActivity.this,DashboardActivity.class);
+                                            startActivity(intent1);
+                                            finish();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<InfoMessage> call, Throwable t) {
+
+                                    }
+                                });
+
+                            }
+                        })
+//set negative button
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //set what should happen when negative button is clicked
+                                Toast.makeText(getApplicationContext(),"Nothing Happened",Toast.LENGTH_LONG).show();
+                            }
+                        })
+                        .show();
             }
         });
         saveImageBtn.setOnClickListener(new View.OnClickListener() {
