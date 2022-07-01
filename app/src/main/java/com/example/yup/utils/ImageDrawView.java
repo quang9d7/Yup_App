@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
@@ -30,6 +32,8 @@ public class ImageDrawView extends androidx.appcompat.widget.AppCompatImageView 
     List<List<Point>> originalBoxes = new ArrayList<>();
     List<String> labels;
     List<Float> scores;
+    Bitmap curBitmap;
+    ImageDrawView imageDrawView;
 
 
     public ImageDrawView(@NonNull Context context, AttributeSet attributeSet) {
@@ -48,17 +52,25 @@ public class ImageDrawView extends androidx.appcompat.widget.AppCompatImageView 
                 for (int i=0; i<scaledBoxes.size(); ++i)
                     if (motionEvent.getAction() == MotionEvent.ACTION_DOWN)
                         if (isInside(scaledBoxes.get(i), absTouchPos)) {
-                            showMenu(labels.get(i));
+                            showMenu(labels.get(i), scaledBoxes.get(i), imageDrawView);
                             return true;
                         }
                 return false;
             }
         });
+        imageDrawView = this;
     }
 
     public void setLabels(List<String> labels) {
         this.labels = labels;
     }
+
+    @Override
+    public void setImageBitmap(Bitmap bm) {
+        curBitmap = bm;
+        super.setImageBitmap(bm);
+    }
+    public Bitmap getCurBitmap() {return curBitmap;}
 
     public void setScores(List<Float> scores) {
         this.scores = scores;
@@ -260,8 +272,8 @@ public class ImageDrawView extends androidx.appcompat.widget.AppCompatImageView 
         return (count % 2 == 1); // Same as (count%2 == 1)
     }
 
-    private void showMenu(String label) {
-        ResultDialog resultDialog = new ResultDialog(context, label);
+    private void showMenu(String label, List<Point> box, ImageDrawView parent) {
+        ResultDialog resultDialog = new ResultDialog(context, label, box, parent);
         resultDialog.show();
     }
 
