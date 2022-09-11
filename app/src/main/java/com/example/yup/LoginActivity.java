@@ -122,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
                         finish();
                     } else {
-                        if (response.code() == 401) {
+                        if (response.code() == 401 || response.code() == 403) {
                             ErrorMessage apiError = ErrorMessage.convertErrors(response.errorBody());
                             Toast.makeText(LoginActivity.this, apiError.getMessage(), Toast.LENGTH_LONG).show();
                         }

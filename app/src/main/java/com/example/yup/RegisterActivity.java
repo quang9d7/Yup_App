@@ -68,6 +68,7 @@ public class RegisterActivity extends AppCompatActivity {
         sign_in_tv.setOnClickListener(v->{
             Intent intent=new Intent(getApplicationContext(),LoginActivity.class);
             startActivity(intent);
+            finish();
         });
 
         register_btn.setOnClickListener(v->{
@@ -193,10 +194,11 @@ public class RegisterActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
 //                    confirmEmail();
                     gotoLogin();
-                    Toast.makeText(RegisterActivity.this, "dang ky thanh cong", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, "Đăng ký tài khoản thành công, vui lòng đăng nhập lại", Toast.LENGTH_LONG).show();
+                    removePrevInfo();
                 }
                 else {
-                    if (response.code() == 401) {
+                    if (response.code() == 401 || response.code() == 403) {
                         ErrorMessage apiError = ErrorMessage.convertErrors(response.errorBody());
                         Toast.makeText(RegisterActivity.this, apiError.getMessage(), Toast.LENGTH_LONG).show();
                     }

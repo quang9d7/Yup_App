@@ -325,6 +325,7 @@ public class DashboardActivity extends AppCompatActivity {
                             }
                         });
                     }
+                    hideProgressBar();
                 }
             }
 

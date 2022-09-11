@@ -175,7 +175,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                                     context.startActivity(intent);
 
                                 } else {
-                                    Toast.makeText(context, "Dang xu ly hinh anh nay", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(context, "Hình ảnh đang được xử lý, vui lòng chờ trong giây lát", Toast.LENGTH_LONG).show();
                                 }
                             }
                         }
